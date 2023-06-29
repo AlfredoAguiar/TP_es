@@ -1,0 +1,126 @@
+﻿@page "/ct"
+@inject HttpClient httpClient
+
+<h3>Client Talents</h3>
+
+@if (clientTalents == null)
+{
+    <p>Loading...</p>
+}
+else if (clientTalents.Length == 0)
+{
+    <p>No client talents found.</p>
+}
+else
+{
+    <table>
+        <thead>
+        <tr>
+            <th>Client Talent ID</th>
+            <th>Client ID</th>
+            <th>Talent ID</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var clientTalent in clientTalents)
+        {
+            <tr>
+                <td>@clientTalent.ClientTalentId</td>
+                <td>@clientTalent.ClientId</td>
+                <td>@clientTalent.TalentId</td>
+                <td>
+                    <button @onclick="()=>GetClientTalentById(clientTalent.ClientTalentId)">Get by ID</button>
+                    <button @onclick="()=>DeleteClientTalent(clientTalent.ClientTalentId)">Delete</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@if (selectedClientTalent != null)
+{
+    <div>
+        <h3>Selected Client Talent</h3>
+        <p><strong>Client Talent ID:</strong> @selectedClientTalent.ClientTalentId</p>
+        <p><strong>Client ID:</strong> @selectedClientTalent.ClientId</p>
+        <p><strong>Talent ID:</strong> @selectedClientTalent.TalentId</p>
+
+        <h4>Edit Client Talent</h4>
+        <form>
+            <label>Client ID:</label>
+            <input type="text" @bind="selectedClientTalent.ClientId" /><br />
+            <label>Talent ID:</label>
+            <input type="text" @bind="selectedClientTalent.TalentId" /><br />
+            <button @onclick="UpdateClientTalent">Update</button>
+        </form>
+    </div>
+}
+
+<div>
+    <h3>Create New Client Talent</h3>
+    <form>
+        <label>Client ID:</label>
+        <input type="text" @bind="newClientTalent.ClientId" /><br />
+        <label>Talent ID:</label>
+        <input type="text" @bind="newClientTalent.TalentId" /><br />
+        <button @onclick="CreateClientTalent">Create</button>
+    </form>
+</div>
+
+@code {
+    private ClientTalent[]? clientTalents;
+    private ClientTalent newClientTalent = new ClientTalent();
+    private ClientTalent selectedClientTalent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadClientTalents();
+    }
+
+    private async Task LoadClientTalents()
+    {
+        clientTalents = await httpClient.GetFromJsonAsync<ClientTalent[]>("http://localhost:5298/api/Clienttalents");
+    }
+
+    private async Task CreateClientTalent()
+    {
+        // Generate a new ID for the client talent
+        newClientTalent.ClientTalentId = Guid.NewGuid();
+
+        // Send the new client talent data to the API for creation
+        await httpClient.PostAsJsonAsync("http://localhost:5298/api/Clienttalents", newClientTalent);
+
+        // Refresh the client talent list
+        await LoadClientTalents();
+
+        // Reset the newClientTalent object
+        newClientTalent = new ClientTalent();
+    }
+
+    private async Task GetClientTalentById(Guid clientTalentId)
+    {
+        selectedClientTalent = await httpClient.GetFromJsonAsync<ClientTalent>($"http://localhost:5298/api/Clienttalents/{clientTalentId}");
+    }
+
+    private async Task DeleteClientTalent(Guid clientTalentId)
+    {
+        await httpClient.DeleteAsync($"http://localhost:5298/api/Clienttalents/{clientTalentId}");
+        await LoadClientTalents();
+    }
+
+    private async Task UpdateClientTalent()
+    {
+        await httpClient.PutAsJsonAsync($"http://localhost:5298/api/Clienttalents/{selectedClientTalent.ClientTalentId}", selectedClientTalent);
+        selectedClientTalent = null;
+        await LoadClientTalents();
+    }
+
+    public class ClientTalent
+    {
+        public Guid ClientTalentId { get; set; }
+        public Guid ClientId { get; set; }
+        public Guid TalentId { get; set; }
+    }
+}

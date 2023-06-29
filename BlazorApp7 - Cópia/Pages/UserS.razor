@@ -1,0 +1,179 @@
+﻿@page "/us"
+@inject HttpClient httpClient
+
+<h3>User Skills</h3>
+
+<div>
+    <label>Search Skill:</label>
+    <select @bind="selectedSkillId">
+        <option value="">-- Select Skill --</option>
+        @foreach (var skill in skills)
+        {
+            <option value="@skill.SkillId">@skill.Name</option>
+        }
+    </select>
+    <button @onclick="SearchUserSkills">Search</button>
+</div>
+
+@if (userSkills == null)
+{
+    <p>Loading...</p>
+}
+else if (userSkills.Length == 0)
+{
+    <p>No user skills found.</p>
+}
+else
+{
+    <table>
+        <thead>
+        <tr>
+            <th>User Skill ID</th>
+            <th>User ID</th>
+            <th>Skill ID</th>
+            <th>Years of Experience</th>
+            <th>Skill</th>
+            <th>User</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var userSkill in userSkills)
+        {
+            <tr>
+                <td>@userSkill.UserSkillId</td>
+                <td>@userSkill.UserId</td>
+                <td>@userSkill.SkillId</td>
+                <td>@userSkill.YearsOfExperience</td>
+                <td>@userSkill.Skill.Name</td>
+                <td>@userSkill.User.username</td>
+                <td>
+                    <button @onclick="() => DeleteUserSkill(userSkill.UserSkillId.ToString())">Delete</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <div>
+        <h3>Create New User Skill</h3>
+        <form>
+            <label>User ID:</label>
+            <input type="text" @bind="newUserSkill.UserId" /><br />
+            <label>Skill ID:</label>
+            <input type="text" @bind="newUserSkill.SkillId" /><br />
+            <label>Years of Experience:</label>
+            <input type="text" @bind="newUserSkill.YearsOfExperience" /><br />
+            <button @onclick="CreateUserSkill">Create</button>
+        </form>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(userWithMatchingSkill))
+{
+    <div>
+        <h3>Users with Matching Skill: @userWithMatchingSkill</h3>
+    </div>
+}
+
+@code {
+    private UserSkill[]? userSkills;
+    private UserSkill newUserSkill = new UserSkill();
+    private UserSkill selectedUserSkill;
+    private string skillName;
+    private string userWithMatchingSkill;
+    private Guid selectedSkillId;
+    private Skill[] skills;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSkills();
+        await LoadUserSkills();
+    }
+
+    private async Task LoadSkills()
+    {
+        skills = await httpClient.GetFromJsonAsync<Skill[]>("http://localhost:5298/api/Skills");
+    }
+
+    private async Task LoadUserSkills()
+    {
+        if (selectedSkillId == Guid.Empty)
+        {
+            userSkills = await httpClient.GetFromJsonAsync<UserSkill[]>("http://localhost:5298/api/UserSkills");
+        }
+        else
+        {
+            userSkills = await httpClient.GetFromJsonAsync<UserSkill[]>($"http://localhost:5298/api/UserSkills?skillId={selectedSkillId}");
+            var matchingUserSkills = userSkills.Where(skill => skill.Skill.SkillId == selectedSkillId).ToList();
+            if (matchingUserSkills.Count > 0)
+            {
+                userWithMatchingSkill = string.Join(", ", matchingUserSkills.Select(skill => skill.User.username));
+            }
+            else
+            {
+                userWithMatchingSkill = null;
+            }
+        }
+    }
+
+    private async Task CreateUserSkill()
+    {
+        // Generate a new ID for the user skill
+        newUserSkill.UserSkillId = Guid.NewGuid();
+
+        // Send the new user skill data to the API for creation
+        await httpClient.PostAsJsonAsync("http://localhost:5298/api/UserSkills", newUserSkill);
+
+        // Refresh the user skill list
+        await LoadUserSkills();
+
+        // Reset the newUserSkill object
+        newUserSkill = new UserSkill();
+    }
+
+    private async Task GetUserSkillById(string userSkillId)
+    {
+        selectedUserSkill = await httpClient.GetFromJsonAsync<UserSkill>($"http://localhost:5298/api/UserSkills/{userSkillId}");
+    }
+
+    private async Task DeleteUserSkill(string userSkillId)
+    {
+        await httpClient.DeleteAsync($"http://localhost:5298/api/UserSkills/{userSkillId}");
+        await LoadUserSkills();
+    }
+
+    private async Task UpdateUserSkill()
+    {
+        await httpClient.PutAsJsonAsync($"http://localhost:5298/api/UserSkills/{selectedUserSkill.UserSkillId}", selectedUserSkill);
+        selectedUserSkill = null;
+        await LoadUserSkills();
+    }
+
+    private async Task SearchUserSkills()
+    {
+        await LoadUserSkills();
+    }
+
+    public class UserSkill
+    {
+        public Guid UserSkillId { get; set; }
+        public string UserId { get; set; }
+        public Guid SkillId { get; set; }
+        public int YearsOfExperience { get; set; }
+        public Skill Skill { get; set; }
+        public User User { get; set; }
+    }
+
+    public class Skill
+    {
+        public Guid SkillId { get; set; }
+        public string? Name { get; set; }
+        public string? ProfessionArea { get; set; }
+    }
+
+    public class User
+    {
+        public string UserId { get; set; }
+        public string? username { get; set; }
+    }
+}

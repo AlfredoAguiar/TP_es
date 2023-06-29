@@ -1,0 +1,252 @@
+﻿@page "/work"
+@inject HttpClient httpClient
+
+<h3>Work Proposals</h3>
+
+@if (workProposals == null)
+{
+    <p>Loading...</p>
+}
+else if (workProposals.Length == 0)
+{
+    <p>No work proposals found.</p>
+}
+else
+{
+    <table>
+        <thead>
+        <tr>
+            <th>Proposal ID</th>
+            <th>User ID</th>
+            <th>Client ID</th>
+            <th>Name</th>
+            <th>Talent Category</th>
+            <th>Skills Required</th>
+            <th>Min Years of Experience</th>
+            <th>Total Hours</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var proposal in workProposals)
+        {
+            <tr>
+                <td>@proposal.ProposalId</td>
+                <td>@proposal.UserId</td>
+                <td>@proposal.ClientId</td>
+                <td>@proposal.Name</td>
+                <td>@proposal.TalentCategory</td>
+                <td>@proposal.SkillsRequired</td>
+                <td>@proposal.MinYearsOfExperience</td>
+                <td>@proposal.TotalHours</td>
+                <td>@proposal.Description</td>
+                <td>
+                    <button @onclick="()=>GetProposalById(proposal.ProposalId)">Get by ID</button>
+                    <button @onclick="()=>DeleteProposal(proposal.ProposalId)">Delete</button>
+                    <button @onclick="()=>LoadTalents(proposal.ProposalId)">Get Talents</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+@if (talents != null && talents.Length > 0)
+{
+<div>
+    <h3>Talents and Total Fees</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Talent Name</th>
+            <th>Hourly Rate</th>
+            <th>Total Hours</th>
+            <th>Total Fee</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var talent in talents)
+        {
+            var totalFee = talent.HourlyRate * (selectedProposal?.TotalHours ?? 0);
+            <tr>
+                <td>@talent.Name</td>
+                <td>@talent.HourlyRate</td>
+                <td>@(selectedProposal?.TotalHours ?? 0)</td>
+                <td>@totalFee</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+}
+else
+{
+<p>No talents found.</p>
+}
+@if (selectedProposal != null)
+{
+    <div>
+        <h3>Selected Proposal</h3>
+        <p><strong>Proposal ID:</strong> @selectedProposal.ProposalId</p>
+        <p><strong>User ID:</strong> @selectedProposal.UserId</p>
+        <p><strong>Client ID:</strong> @selectedProposal.ClientId</p>
+        <p><strong>Name:</strong> @selectedProposal.Name</p>
+        <p><strong>Talent Category:</strong> @selectedProposal.TalentCategory</p>
+        <p><strong>Skills Required:</strong> @selectedProposal.SkillsRequired</p>
+        <p><strong>Min Years of Experience:</strong> @selectedProposal.MinYearsOfExperience</p>
+        <p><strong>Total Hours:</strong> @selectedProposal.TotalHours</p>
+        <p><strong>Description:</strong> @selectedProposal.Description</p>
+
+        <h4>Edit Proposal</h4>
+        <form>
+            <label>User ID:</label>
+            <input type="text" @bind="selectedProposal.UserId" /><br />
+            <label>Client ID:</label>
+            <input type="text" @bind="selectedProposal.ClientId" /><br />
+            <label>Name:</label>
+            <input type="text" @bind="selectedProposal.Name" /><br />
+            <label>Talent Category:</label>
+            <input type="text" @bind="selectedProposal.TalentCategory" /><br />
+            <label>Skills Required:</label>
+            <input type="text" @bind="selectedProposal.SkillsRequired" /><br />
+            <label>Min Years of Experience:</label>
+            <input type="text" @bind="selectedProposal.MinYearsOfExperience" /><br />
+            <label>Total Hours:</label>
+            <input type="text" @bind="selectedProposal.TotalHours" /><br />
+            <label>Description:</label>
+            <input type="text" @bind="selectedProposal.Description" /><br />
+            <button @onclick="UpdateProposal">Update</button>
+        </form>
+    </div>
+}
+
+<div>
+    <h3>Create New Proposal</h3>
+    <form>
+        <label>User ID:</label>
+        <input type="text" @bind="newProposal.UserId" /><br />
+        <label>Client ID:</label>
+        <input type="text" @bind="newProposal.ClientId" /><br />
+        <label>Name:</label>
+        <input type="text" @bind="newProposal.Name" /><br />
+        <label>Talent Category:</label>
+        <input type="text" @bind="newProposal.TalentCategory" /><br />
+        <label>Skills Required:</label>
+        <input type="text" @bind="newProposal.SkillsRequired" /><br />
+        <label>Min Years of Experience:</label>
+        <input type="text" @bind="newProposal.MinYearsOfExperience" /><br />
+        <label>Total Hours:</label>
+        <input type="text" @bind="newProposal.TotalHours" /><br />
+        <label>Description:</label>
+        <input type="text" @bind="newProposal.Description" /><br />
+        <button @onclick="CreateProposal">Create</button>
+    </form>
+</div>
+ <h3>Grouped Proposals</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Talent Category</th>
+                <th>Total Hours</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in groupedProposalsTotalHours)
+            {
+                <tr>
+                    <td>@entry.Key</td>
+                    <td>@entry.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+@code {
+    private Talent[] talents;
+    private Workproposal[]? workProposals;
+    private Workproposal newProposal = new Workproposal();
+    private Workproposal selectedProposal;
+    private Dictionary<string, int> groupedProposalsTotalHours;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWorkProposals();
+    }
+
+    private async Task LoadWorkProposals()
+    {
+        workProposals = await httpClient.GetFromJsonAsync<Workproposal[]>("http://localhost:5298/api/Workproposals");
+
+   
+        var groupedProposals = workProposals.GroupBy(p => p.TalentCategory);
+
+    // Calcular o total de horas para cada categoria e armazenar no dicionário
+        groupedProposalsTotalHours = new Dictionary<string, int>();
+        foreach (var group in groupedProposals)
+        {
+            var totalHours = group.Sum(p => p.TotalHours ?? 0);
+            groupedProposalsTotalHours[group.Key] = totalHours;
+        }
+    }
+
+    private async Task CreateProposal()
+    {
+        // Generate a new ID for the proposal
+        newProposal.ProposalId = Guid.NewGuid();
+
+        // Send the new proposal data to the API for creation
+        await httpClient.PostAsJsonAsync("http://localhost:5298/api/Workproposals", newProposal);
+
+        // Refresh the work proposal list
+        await LoadWorkProposals();
+
+        // Reset the newProposal object
+        newProposal = new Workproposal();
+    }
+
+    private async Task GetProposalById(Guid proposalId)
+    {
+        selectedProposal = await httpClient.GetFromJsonAsync<Workproposal>($"http://localhost:5298/api/Workproposals/{proposalId}");
+    }
+
+    private async Task DeleteProposal(Guid proposalId)
+    {
+        await httpClient.DeleteAsync($"http://localhost:5298/api/Workproposals/{proposalId}");
+        await LoadWorkProposals();
+    }
+
+    private async Task UpdateProposal()
+    {
+        await httpClient.PutAsJsonAsync($"http://localhost:5298/api/Workproposals/{selectedProposal.ProposalId}", selectedProposal);
+        selectedProposal = null;
+        await LoadWorkProposals();
+    }
+
+    public class Workproposal
+    {
+        public Guid ProposalId { get; set; }
+        public Guid? UserId { get; set; }
+        public Guid? ClientId { get; set; }
+        public string? Name { get; set; }
+        public string? TalentCategory { get; set; }
+        public string? SkillsRequired { get; set; }
+        public int? MinYearsOfExperience { get; set; }
+        public int? TotalHours { get; set; }
+        public string? Description { get; set; }
+    }
+    
+    private async Task LoadTalents(Guid proposalId)
+    {
+        talents = await httpClient.GetFromJsonAsync<Talent[]>("http://localhost:5298/api/Talents");
+    }
+    
+    
+    public class Talent
+    {
+        public Guid TalentId { get; set; }
+        public string? Name { get; set; }
+        public string? Country { get; set; }
+        public string? Email { get; set; }
+        public float HourlyRate { get; set; }
+       
+    }
+
+}

@@ -1,0 +1,126 @@
+﻿@page "/sk"
+@inject HttpClient httpClient
+
+<h3>Skills</h3>
+
+@if (skills == null)
+{
+    <p>Loading...</p>
+}
+else if (skills.Length == 0)
+{
+    <p>No skills found.</p>
+}
+else
+{
+    <table>
+        <thead>
+        <tr>
+            <th>Skill ID</th>
+            <th>Name</th>
+            <th>Profession Area</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var skill in skills)
+        {
+            <tr>
+                <td>@skill.SkillId</td>
+                <td>@skill.Name</td>
+                <td>@skill.ProfessionArea</td>
+                <td>
+                    <button @onclick="()=>GetSkillById(skill.SkillId)">Get by ID</button>
+                    <button @onclick="()=>DeleteSkill(skill.SkillId)">Delete</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@if (selectedSkill != null)
+{
+    <div>
+        <h3>Selected Skill</h3>
+        <p><strong>Skill ID:</strong> @selectedSkill.SkillId</p>
+        <p><strong>Name:</strong> @selectedSkill.Name</p>
+        <p><strong>Profession Area:</strong> @selectedSkill.ProfessionArea</p>
+
+        <h4>Edit Skill</h4>
+        <form>
+            <label>Name:</label>
+            <input type="text" @bind="selectedSkill.Name" /><br />
+            <label>Profession Area:</label>
+            <input type="text" @bind="selectedSkill.ProfessionArea" /><br />
+            <button @onclick="UpdateSkill">Update</button>
+        </form>
+    </div>
+}
+
+<div>
+    <h3>Create New Skill</h3>
+    <form>
+        <label>Name:</label>
+        <input type="text" @bind="newSkill.Name" /><br />
+        <label>Profession Area:</label>
+        <input type="text" @bind="newSkill.ProfessionArea" /><br />
+        <button @onclick="CreateSkill">Create</button>
+    </form>
+</div>
+
+@code {
+    private Skill[]? skills;
+    private Skill newSkill = new Skill();
+    private Skill selectedSkill;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSkills();
+    }
+
+    private async Task LoadSkills()
+    {
+        skills = await httpClient.GetFromJsonAsync<Skill[]>("http://localhost:5298/api/Skills");
+    }
+
+    private async Task CreateSkill()
+    {
+        // Generate a new ID for the skill
+        newSkill.SkillId = Guid.NewGuid();
+
+        // Send the new skill data to the API for creation
+        await httpClient.PostAsJsonAsync("http://localhost:5298/api/Skills", newSkill);
+
+        // Refresh the skill list
+        await LoadSkills();
+
+        // Reset the newSkill object
+        newSkill = new Skill();
+    }
+
+    private async Task GetSkillById(Guid skillId)
+    {
+        selectedSkill = await httpClient.GetFromJsonAsync<Skill>($"http://localhost:5298/api/Skills/{skillId}");
+    }
+
+    private async Task DeleteSkill(Guid skillId)
+    {
+        await httpClient.DeleteAsync($"http://localhost:5298/api/Skills/{skillId}");
+        await LoadSkills();
+    }
+
+    private async Task UpdateSkill()
+    {
+        await httpClient.PutAsJsonAsync($"http://localhost:5298/api/Skills/{selectedSkill.SkillId}", selectedSkill);
+        selectedSkill = null;
+        await LoadSkills();
+    }
+
+    public class Skill
+    {
+        public Guid SkillId { get; set; }
+        public string? Name { get; set; }
+        public string? ProfessionArea { get; set; }
+    }
+}

@@ -1,0 +1,17 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=25d9ce44_002De694_002D4995_002Dafae_002D7e6e62f36fc5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ClientsControllerTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::C0DAF1F4-5EAA-436A-BF2F-5AE82B99FDE4::net7.0::TestProject2.ClientsControllerTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=937a15f7_002D1ee9_002D48e0_002Daac2_002Deb6779a9e6ca/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetClient_NonExistingClientId_ReturnsNotFound" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::C0DAF1F4-5EAA-436A-BF2F-5AE82B99FDE4::net7.0::TestProject2.ClientsControllerTests.GetClient_NonExistingClientId_ReturnsNotFound&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+    &lt;ProjectFile&gt;C0DAF1F4-5EAA-436A-BF2F-5AE82B99FDE4/f:skills.cs&lt;/ProjectFile&gt;&#xD;
+    &lt;ProjectFile&gt;C0DAF1F4-5EAA-436A-BF2F-5AE82B99FDE4/f:talents.cs&lt;/ProjectFile&gt;&#xD;
+  &lt;/Or&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	</wpf:ResourceDictionary>

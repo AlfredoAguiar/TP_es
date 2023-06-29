@@ -1,0 +1,65 @@
+﻿@page "/Ref"
+@inject HttpClient httpClient
+
+<h3>User Registo</h3>
+
+
+<div>
+    <h3>Create New User</h3>
+    <form>
+            <label>Username:</label>
+            <input type="text" @bind="newUser.username" /><br />
+            <label>Email:</label>
+            <select @bind="newUser.email">
+                <option value="User_">User</option>
+                <option value="User_M">User_M</option>
+                <option value="Admin">Admin</option>
+            </select><br />
+            <label>Password:</label>
+            <input type="password" @bind="newUser.password" /><br />
+            <button @onclick="CreateUser">Create</button>
+        </form>
+</div>
+
+@code {
+    private User[]? users;
+    private User newUser = new User();
+    private User selectedUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        users = await httpClient.GetFromJsonAsync<User[]>("http://localhost:5298/api/Users");
+    }
+
+    private async Task CreateUser()
+    {
+    // Generate a new ID for the user
+        newUser.userId = Guid.NewGuid();
+
+    // Send the new user data to the API for creation
+        await httpClient.PostAsJsonAsync("http://localhost:5298/api/Users", newUser);
+
+    // Refresh the user list
+        await LoadUsers();
+
+    // Reset the newUser object
+        newUser = new User();
+    }
+
+    
+
+    
+
+    public class User
+    {
+        public Guid userId { get; set; }
+        public string? email { get; set; }
+        public string? password { get; set; }
+        public string? username { get; set; }
+    }
+}

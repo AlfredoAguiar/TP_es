@@ -1,0 +1,118 @@
+﻿@page "/C"
+@inject HttpClient httpClient
+
+<h3>Clients</h3>
+
+@if (clients == null)
+{
+    <p>Loading...</p>
+}
+else if (clients.Length == 0)
+{
+    <p>No clients found.</p>
+}
+else
+{
+    <table>
+        <thead>
+        <tr>
+            <th>Client ID</th>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in clients)
+            {
+                <tr>
+                    <td>@client.ClientId</td>
+                    <td>@client.Name</td>
+                    <td>
+                        <button @onclick="()=>GetClientById(client.ClientId)">Get by ID</button>
+                        <button @onclick="()=>DeleteClient(client.ClientId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (selectedClient != null)
+{
+    <div>
+        <h3>Selected Client</h3>
+        <p><strong>Client ID:</strong> @selectedClient.ClientId</p>
+        <p><strong>Name:</strong> @selectedClient.Name</p>
+
+        <h4>Edit Client</h4>
+        <form>
+            <label>Name:</label>
+            <input type="text" @bind="selectedClient.Name" /><br />
+            <button @onclick="UpdateClient">Update</button>
+        </form>
+    </div>
+}
+
+<div>
+    <h3>Create New Client</h3>
+    <form>
+        <label>Name:</label>
+        <input type="text" @bind="newClient.Name" /><br />
+        <button @onclick="CreateClient">Create</button>
+    </form>
+</div>
+
+@code {
+    private Client[]? clients;
+    private Client newClient = new Client();
+    private Client selectedClient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadClients();
+    }
+
+    private async Task LoadClients()
+    {
+        clients = await httpClient.GetFromJsonAsync<Client[]>("http://localhost:5298/api/Clients");
+    }
+
+    private async Task CreateClient()
+    {
+        // Generate a new ID for the client
+        newClient.ClientId = Guid.NewGuid();
+
+        // Send the new client data to the API for creation
+        await httpClient.PostAsJsonAsync("http://localhost:5298/api/Clients", newClient);
+
+        // Refresh the client list
+        await LoadClients();
+
+        // Reset the newClient object
+        newClient = new Client();
+    }
+
+    private async Task GetClientById(Guid clientId)
+    {
+        selectedClient = await httpClient.GetFromJsonAsync<Client>($"http://localhost:5298/api/Clients/{clientId}");
+    }
+
+    private async Task DeleteClient(Guid clientId)
+    {
+        await httpClient.DeleteAsync($"http://localhost:5298/api/Clients/{clientId}");
+        await LoadClients();
+    }
+
+    private async Task UpdateClient()
+    {
+        await httpClient.PutAsJsonAsync($"http://localhost:5298/api/Clients/{selectedClient.ClientId}", selectedClient);
+        selectedClient = null;
+        await LoadClients();
+    }
+
+    public class Client
+    {
+        public Guid ClientId { get; set; }
+        public string? Name { get; set; }
+    }
+}

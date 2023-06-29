@@ -1,0 +1,157 @@
+﻿@page "/tal"
+@using System.Collections
+@inject HttpClient httpClient
+
+<h3>Talent List</h3>
+
+@if (talents == null)
+{
+    <p>Loading...</p>
+}
+else if (talents.Length == 0)
+{
+    <p>No talents found.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Talent ID</th>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Email</th>
+                <th>Hourly Rate</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var talent in talents)
+            {
+                <tr>
+                    <td>@talent.TalentId</td>
+                    <td>@talent.Name</td>
+                    <td>@talent.Country</td>
+                    <td>@talent.Email</td>
+                    <td>@talent.HourlyRate</td>
+                    <td>
+                        <button @onclick="()=>GetTalentById(talent.TalentId)">Get by ID</button>
+                        <button @onclick="()=>DeleteTalent(talent.TalentId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (selectedTalent != null)
+{
+    <div>
+        <h3>Selected Talent</h3>
+        <p><strong>Talent ID:</strong> @selectedTalent.TalentId</p>
+        <p><strong>Name:</strong> @selectedTalent.Name</p>
+        <p><strong>Country:</strong> @selectedTalent.Country</p>
+        <p><strong>Email:</strong> @selectedTalent.Email</p>
+        <p><strong>Hourly Rate:</strong> @selectedTalent.HourlyRate</p>
+          @foreach (var talent in talents)
+          {
+              var mensal = selectedTalent.HourlyRate * 176;
+              
+          <p><strong>Mensal:</strong> @mensal</p>
+}
+        <h4>Edit Talent</h4>
+        <form>
+            <label>Name:</label>
+            <input type="text" @bind="selectedTalent.Name" /><br />
+            <label>Country:</label>
+            <input type="text" @bind="selectedTalent.Country" /><br />
+            <label>Email:</label>
+            <input type="text" @bind="selectedTalent.Email" /><br />
+            <label>Hourly Rate:</label>
+            <input type="text" @bind="selectedTalent.HourlyRate" /><br />
+            <button @onclick="UpdateTalent">Update</button>
+        </form>
+    </div>
+}
+
+<div>
+    <h3>Create New Talent</h3>
+    <form>
+        <label>Name:</label>
+        <input type="text" @bind="newTalent.Name" /><br />
+        <label>Country:</label>
+        <input type="text" @bind="newTalent.Country" /><br />
+        <label>Email:</label>
+        <input type="text" @bind="newTalent.Email" /><br />
+        <label>Hourly Rate:</label>
+        <input type="text" @bind="newTalent.HourlyRate" /><br />
+        <button @onclick="CreateTalent">Create</button>
+    </form>
+</div>
+
+@code {
+    private Talent[] talents;
+    private Talent newTalent = new Talent();
+    private Talent selectedTalent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTalents();
+    }
+
+    private async Task LoadTalents()
+    {
+        try
+        {
+            talents = await httpClient.GetFromJsonAsync<Talent[]>("http://localhost:5298/api/Talents");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading talents: {ex.Message}");
+        }
+    }
+
+    private async Task CreateTalent()
+    {
+        // Generate a new ID for the talent
+        newTalent.TalentId = Guid.NewGuid();
+
+        // Send the new talent data to the API for creation
+        await httpClient.PostAsJsonAsync("http://localhost:5298/api/Talents", newTalent);
+
+        // Refresh the talent list
+        await LoadTalents();
+
+        // Reset the newTalent object
+        newTalent = new Talent();
+    }
+
+    private async Task GetTalentById(Guid id)
+    {
+        selectedTalent = await httpClient.GetFromJsonAsync<Talent>($"http://localhost:5298/api/Talents/{id}");
+        var mensal = selectedTalent.HourlyRate * 176;
+    }
+
+    private async Task DeleteTalent(Guid id)
+    {
+        await httpClient.DeleteAsync($"http://localhost:5298/api/Talents/{id}");
+        await LoadTalents();
+    }
+
+    private async Task UpdateTalent()
+    {
+        await httpClient.PutAsJsonAsync($"http://localhost:5298/api/Talents/{selectedTalent.TalentId}", selectedTalent);
+        selectedTalent = null;
+        await LoadTalents();
+    }
+
+    public class Talent
+    {
+        public Guid TalentId { get; set; }
+        public string? Name { get; set; }
+        public string? Country { get; set; }
+        public string? Email { get; set; }
+        public float HourlyRate { get; set; }
+       
+    }
+}

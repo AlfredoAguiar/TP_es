@@ -1,0 +1,51 @@
+﻿@page "/"
+@using System.Net
+@using BlazorApp7.service
+@inject HttpClient httpClient
+@inject AuthService authService
+<h3>Login</h3>
+
+@if (errorMessage != null)
+{
+    <p style="color: red;">@errorMessage</p>
+}
+
+<form>
+    <label>Username:</label>
+    <input type="text" @bind="login.Username" /><br />
+    <label>Password:</label>
+    <input type="password" @bind="login.Password" /><br />
+    <button @onclick="Authenticate">Login</button>
+</form>
+
+@code {
+    private LoginModel login = new LoginModel();
+    private string errorMessage;
+
+    private async Task Authenticate()
+    {
+        var response = await httpClient.PostAsJsonAsync("http://localhost:5298/api/Auth/login", login);
+
+        if (response.IsSuccessStatusCode)
+        {
+            authService.SetUnauthenticated();
+            StateHasChanged();
+        }
+        else if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+    // Authentication failed
+            errorMessage = "Invalid username or password";
+        }
+        else
+        {
+    // Other error occurred
+            errorMessage = "An error occurred during login";
+        }
+    }
+
+    public class LoginModel
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+}

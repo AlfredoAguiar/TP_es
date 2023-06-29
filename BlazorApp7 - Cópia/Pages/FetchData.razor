@@ -1,0 +1,157 @@
+﻿@page "/fetchdata"
+@inject HttpClient httpClient
+
+<h3>Experience List</h3>
+
+@if (experiences == null)
+{
+    <p>Loading...</p>
+}
+else if (experiences.Length == 0)
+{
+    <p>No experiences found.</p>
+}
+else
+{
+    <ul>
+        @foreach (var experience in experiences)
+        {
+            <li>
+                <strong>@experience.experienceId</strong> - @experience.title - @experience.companyName (@experience.startYear - @experience.endYear)
+                <button @onclick="()=>GetExperienceById(experience.experienceId.ToString())">Get by ID</button>
+                <button @onclick="()=>DeleteExperience(experience.experienceId.ToString())">Delete</button>
+            </li>
+        }
+    </ul>
+}
+
+<div>
+    <h3>Create New Experience</h3>
+    <form>
+        <label>Title:</label>
+        <input type="text" @bind="newExperience.title" /><br />
+        <label>Company Name:</label>
+        <input type="text" @bind="newExperience.companyName" /><br />
+        <label>Start Year:</label>
+        <input type="number" @bind="newExperience.startYear" /><br />
+        @if (!string.IsNullOrEmpty(newExperience.StartYearError))
+        {
+            <p style="color: red;">@newExperience.StartYearError</p>
+        }
+        <label>End Year:</label>
+        <input type="number" @bind="newExperience.endYear" /><br />
+        @if (!string.IsNullOrEmpty(newExperience.EndYearError))
+        {
+            <p style="color: red;">@newExperience.EndYearError</p>
+        }
+        <label>Experience ID:</label>
+        <input type="text" @bind="newExperience.experienceId" /><br />
+        <label>Talent ID:</label>
+        <input type="text" @bind="newExperience.talentId" /><br />
+        <button @onclick="CreateExperience">Create</button>
+    </form>
+</div>
+
+@if (selectedExperience != null)
+{
+    <div>
+        <h3>Selected Experience</h3>
+        <p><strong>Experience ID:</strong> @selectedExperience.experienceId</p>
+        <p><strong>Title:</strong> @selectedExperience.title</p>
+        <p><strong>Company Name:</strong> @selectedExperience.companyName</p>
+        <p><strong>Start Year:</strong> @selectedExperience.startYear</p>
+        <p><strong>End Year:</strong> @selectedExperience.endYear</p>
+
+        <h4>Edit Experience</h4>
+        <form>
+            <label>Title:</label>
+            <input type="text" @bind="selectedExperience.title" /><br />
+            <label>Company Name:</label>
+            <input type="text" @bind="selectedExperience.companyName" /><br />
+            <label>Start Year:</label>
+            <input type="number" @bind="selectedExperience.startYear" /><br />
+            <label>End Year:</label>
+            <input type="number" @bind="selectedExperience.endYear" /><br />
+            <button @onclick="UpdateExperience">Update</button>
+        </form>
+    </div>
+}
+
+@code {
+    private Experience[]? experiences;
+    private Experience newExperience = new Experience();
+    private Experience selectedExperience;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadExperiences();
+    }
+
+    private async Task LoadExperiences()
+    {
+        experiences = await httpClient.GetFromJsonAsync<Experience[]>("http://localhost:5298/api/Experiences");
+    }
+
+    private async Task CreateExperience()
+    {
+        if (newExperience.startYear <= 1950)
+        {
+            newExperience.StartYearError = "ano inicio deve ser mais de  1950.";
+            newExperience.EndYearError = null;
+            return;
+        }
+
+        if (newExperience.endYear <= newExperience.startYear)
+        {
+            newExperience.StartYearError = null;
+            newExperience.EndYearError = "ano Fim deve ser mais de ano inicio ";
+            return;
+        }
+
+        newExperience.StartYearError = null;
+        newExperience.EndYearError = null;
+
+        await httpClient.PostAsJsonAsync("http://localhost:5298/api/Experiences", newExperience);
+        newExperience = new Experience();
+        await LoadExperiences();
+    }
+
+    private async Task GetExperienceById(string id)
+    {
+        selectedExperience = await httpClient.GetFromJsonAsync<Experience>($"http://localhost:5298/api/Experiences/{id}");
+    }
+
+    private async Task DeleteExperience(string id)
+    {
+        var response = await httpClient.DeleteAsync($"http://localhost:5298/api/Experiences/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadExperiences();
+        }
+        else
+        {
+            // Handle the error case if needed
+        }
+    }
+    private async Task UpdateExperience()
+    {
+        var response = await httpClient.PutAsJsonAsync($"http://localhost:5298/api/Experiences/{selectedExperience.experienceId}", selectedExperience);
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadExperiences();
+        }
+    }
+       
+    
+    public class Experience
+    {
+        public Guid? experienceId { get; set; }
+        public string? title { get; set; }
+        public Guid? talentId { get; set; }
+        public string? companyName { get; set; }
+        public int? endYear { get; set; }
+        public int? startYear { get; set; }
+        public string? StartYearError { get; set; }
+        public string? EndYearError { get; set; }
+    }
+}

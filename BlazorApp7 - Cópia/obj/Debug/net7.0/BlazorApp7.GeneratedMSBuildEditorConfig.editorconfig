@@ -1,0 +1,77 @@
+is_global = true
+build_property.TargetFramework = net7.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = BlazorApp7
+build_property.RootNamespace = BlazorApp7
+build_property.ProjectDir = C:\Users\diagu\RiderProjects\WebApplication2\BlazorApp7\
+build_property.RazorLangVersion = 7.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\diagu\RiderProjects\WebApplication2\BlazorApp7
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/Cli.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/ClienteTa.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50ZVRhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/FetchData.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmV0Y2hEYXRhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/Resgisto.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVzZ2lzdG8ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/Sk.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2sucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/Tal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/UserS.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/Work.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV29yay5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Pages/_Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xvZ2luLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-d4we8d661d
+
+[C:/Users/diagu/RiderProjects/WebApplication2/BlazorApp7/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-68a8spis2a

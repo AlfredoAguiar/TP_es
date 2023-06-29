@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>BlazorApp7.csproj</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #c191ff;}
+.s1 { color: #85c46c;}
+.s2 { color: #c9a26d;}
+.s3 { color: #d0d0d0;}
+.s4 { color: #bdbdbd;}
+</style>
+</head>
+<body bgcolor="#262626">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+BlazorApp7.csproj</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;Project </span><span class="s1">Sdk</span><span class="s2">=&quot;Microsoft.NET.Sdk.BlazorWebAssembly&quot;</span><span class="s0">&gt;</span>
+
+    <span class="s0">&lt;PropertyGroup&gt;</span>
+        <span class="s0">&lt;TargetFramework&gt;</span><span class="s4">net7.0</span><span class="s0">&lt;/TargetFramework&gt;</span>
+        <span class="s0">&lt;Nullable&gt;</span><span class="s4">enable</span><span class="s0">&lt;/Nullable&gt;</span>
+        <span class="s0">&lt;ImplicitUsings&gt;</span><span class="s4">enable</span><span class="s0">&lt;/ImplicitUsings&gt;</span>
+        <span class="s0">&lt;DockerDefaultTargetOS&gt;</span><span class="s4">Windows</span><span class="s0">&lt;/DockerDefaultTargetOS&gt;</span>
+    <span class="s0">&lt;/PropertyGroup&gt;</span>
+
+    <span class="s0">&lt;ItemGroup&gt;</span>
+        <span class="s0">&lt;PackageReference </span><span class="s1">Include</span><span class="s2">=&quot;Microsoft.AspNetCore.Components.WebAssembly&quot; </span><span class="s1">Version</span><span class="s2">=&quot;7.0.5&quot; </span><span class="s0">/&gt;</span>
+        <span class="s0">&lt;PackageReference </span><span class="s1">Include</span><span class="s2">=&quot;Microsoft.AspNetCore.Components.WebAssembly.DevServer&quot; </span><span class="s1">Version</span><span class="s2">=&quot;7.0.5&quot; </span><span class="s1">PrivateAssets</span><span class="s2">=&quot;all&quot; </span><span class="s0">/&gt;</span>
+    <span class="s0">&lt;/ItemGroup&gt;</span>
+
+    <span class="s0">&lt;ItemGroup&gt;</span>
+      <span class="s0">&lt;Content </span><span class="s1">Include</span><span class="s2">=&quot;..\.dockerignore&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;Link&gt;</span><span class="s4">.dockerignore</span><span class="s0">&lt;/Link&gt;</span>
+      <span class="s0">&lt;/Content&gt;</span>
+    <span class="s0">&lt;/ItemGroup&gt;</span>
+
+<span class="s0">&lt;/Project&gt;</span>
+</pre>
+</body>
+</html>
